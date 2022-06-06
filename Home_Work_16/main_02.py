@@ -13,12 +13,12 @@ db = SQLAlchemy(app)
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String(75))
-    last_name = db.Column(db.String(75))
+    first_name = db.Column(db.String(75), nullable=False)
+    last_name = db.Column(db.String(75), nullable=False)
     age = db.Column(db.Integer)
-    email = db.Column(db.String(100))
+    email = db.Column(db.String(100), unique=True)
     role = db.Column(db.String(80))
-    phone = db.Column(db.String(50))
+    phone = db.Column(db.String(16), unique=True)
 
 
 class Order(db.Model):
@@ -41,7 +41,12 @@ class Offer(db.Model):
     executor_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
 
-db.create_all()
+def main():
+    db.create_all()
+    insert_data_01()
+
+    app.run(debug=True)
+
 
 #######################################################################################################################
 def insert_data_01():
@@ -92,12 +97,96 @@ def insert_data_01():
             db.session.add_all(offer_list)
 
 ##############################################################################################################
+# Создать представления по методу 'GET' для /orders
+# Посредством метода 'POST' на URL /orders реализовать создание пользователя
+# Создать представления по методу 'GET' для /orders/1 для получения одного пользователя
+# Посредством метода 'PUT' на URL /orders/<id> реализовать обновление заказа order
+# Посредством метода 'DELETE' на URL /orders/<id> реализовать удаление заказа order
 
+@app.route('/', methods=['GET', 'POST'])
+def get_orders_01():
+    if request.method == 'GET':
+        data = []
+        for order in Order.query.all():
+            customer = User.query.get(order.customer_id).first_name if User.query.get(order.customer_id) else order.customer_id
+            executor = User.query.get(order.executor_id).first_name if User.query.get (order.executor_id) else order.executor_id
+            data.append({
+                'id': order.id,
+                'name': order.name,
+                'description': order.description,
+                'start_date': order.start_date,
+                'end_date': order.end_date,
+                'address': order.address,
+                'price': order.price,
+                'customer_id': customer,
+                'executor_id': executor,
+            })
+        return jsonify(data)
+
+    elif request.method == 'POST':
+        data = request.get_json()
+        new_order = Order(
+                name=data['name'],
+                description=data['description'],
+                start_date=datetime.strptime(data['start_date'], '%m/%d/%Y'),
+                end_date=datetime.strptime(data['end_date'], '%m/%d/%Y'),
+                address=data['address'],
+                price=data['price'],
+                customer_id=data['customer_id'],
+                executor_id=data['executor_id'],
+            )
+        db.session.add(new_order)
+        db.session.commit()
+
+
+@app.route('/orders/<int:id>/', methods=['GET', 'PUT', 'DELETE'])
+def get_orders_by_id(id):
+    if request.method == 'GET':
+        order = Order.query.get(id)
+        data = {
+           'id': order.id,
+           'name': order.name,
+           'description': order.description,
+           'start_date': order.start_date,
+           'end_date': order.end_date,
+           'address': order.address,
+           'price': order.price,
+           'customer_id': order.customer_id,
+           'executor_id': order.executor_id,
+            }
+        return jsonify(data)
+
+    elif request.method == 'PUT':
+        data = request.get_json()
+        order = Order.query.get(id)
+        order.name = 'new_order'
+        order.description=data['description']
+        order.start_date=datetime.strptime(data['start_date'], '%m/%d/%Y')
+        order.end_date=datetime.strptime(data['end_date'], '%m/%d/%Y')
+        order.address=data['address']
+        order.price=data['price']
+        order.customer_id=data['customer_id']
+        order.executor_id=data['executor_id']
+
+        db.session.add(order)
+        db.session.commit()
+
+        return '', 203
+
+    elif request.method == 'DELETE':
+        order = Order.query.get(id)
+        db.session.add(order)
+        db.session.commit()
+
+#######################################################################################################################
+# Создать представления по методу 'GET' для /users
+# Посредством метода 'POST' на URL /users реализовать создание пользователя
+# Создать представления по методу 'GET' для /users/1 для получения одного пользователя
+# Посредством метода 'PUT' на URL /users/<id> реализовать обновление пользователя user
+# Посредством метода 'DELETE' на URL /users/<id> реализовать удаление пользователя user
 
 @app.route('/', methods=['GET', 'POST'])
 def get_users_01():
-
-    # Создать представления по методу 'GET' для /users.
     if request.method == 'GET':
         data = []
         for user in User.query.all():
@@ -111,20 +200,7 @@ def get_users_01():
                 'phone': user.phone,
             })
         return jsonify(data)
-    # Создать представления по методу 'GET' для /users/1 для получения одного пользователя.
-    elif request.method == 'GET':
-            user = User.query.get(id)
-            data = {
-                'id': user.id,
-                'first_name': user.first_name,
-                'last_name': user.last_name,
-                'age': user.age,
-                'email': user.email,
-                'role': user.role,
-                'phone': user.phone,
-            }
-            return jsonify(data)
-    # Посредством метода 'POST' на URL /users реализовать создание пользователя.
+
     elif request.method == 'POST':
         data = request.get_json()
         new_users = User(
@@ -137,13 +213,24 @@ def get_users_01():
         )
         db.session.add(new_users)
         db.session.commit()
-    else: "Ошибка."
 
 
-@app.route('/users/', methods=['PUT', 'DELETE'])
-def get_users_02():
-    # Посредством метода 'PUT' на URL /users/<id> реализовать обновление пользователя user.
-    if request.method == 'PUT':
+@app.route('/users/<int:id>/', methods=['GET', 'PUT', 'DELETE'])
+def get_users_by_id(id):
+    if request.method == 'GET':
+        user = User.query.get(id)
+        data = {
+            'id': user.id,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'age': user.age,
+            'email': user.email,
+            'role': user.role,
+            'phone': user.phone,
+        }
+        return jsonify(data)
+
+    elif request.method == 'PUT':
         data = request.get_json()
         user = User.query.get(id)
         user.first_name = 'new_user'
@@ -155,82 +242,71 @@ def get_users_02():
 
         db.session.add(user)
         db.session.commit()
+
         return '', 203
-    # Посредством метода 'DELETE' на URL /users/<id> реализовать удаление пользователя user.
+
     elif request.method == 'DELETE':
         user = Order.query.get(id)
         db.session.add(user)
         db.session.commit()
-    else: "Ошибка."
 
-#######################################################################################################
-
-# Создать представления по методу 'GET' для /orders
-@app.route('/orders/')
-def get_orders():
-    pass
-
-
-# Создать представления по методу 'GET' для /orders/1 для получения одного пользователя
-@app.route('/orders/<int:id>/')
-def get_orders_by_id(id):
-    pass
-
-
-# Посредством метода 'POST' на URL /orders реализовать создание пользователя
-@app.route('/orders/post/')
-def orders_post():
-    pass
-
-
-# Посредством метода 'PUT' на URL /orders/<id> реализовать обновление заказа order
-@app.route('/orders/<int:id>/put/')
-def orders_put():
-    pass
-
-
-# Посредством метода 'DELETE' на URL /orders/<id> реализовать удаление заказа order
-@app.route('/orders/<int:id>/delete/')
-def orders_delete():
-    pass
-
-
-#######################################################################################################################
-
+##########################################################################################################################
 # Создать представления по методу 'GET' для /offers
-@app.route('/offers/')
-def get_offers():
-    pass
-
-
-# Создать представления по методу 'GET' для /offers/<id> для получения одного пользователя
-@app.route('/offers/<int:id>/')
-def get_offers_by_id(id):
-    pass
-
-
 # Посредством метода 'POST' на URL /offers реализовать создание пользователя
-@app.route('/offers/post/')
-def offers_post():
-    pass
-
-
+# Создать представления по методу 'GET' для /offers/<id> для получения одного пользователя
 # Посредством метода 'PUT' на URL /offers/<id> реализовать обновление предложения offer
-@app.route('/offers/<int:id>/put/')
-def offers_put():
-    pass
-
-
 # Посредством метода 'DELETE' на URL /offers/<id> реализовать удаление предложения offer
-@app.route('/offers/<int:id>/delete/')
-def offers_delete():
-    pass
+
+@app.route('/', methods=['GET', 'POST'])
+def get_offers_01():
+    if request.method == 'GET':
+        data = []
+        for offer in Offer.query.all():
+            data.append({
+                'id': offer.id,
+                'order_id': offer.order_id,
+                'executor_id': offer.executor_id,
+
+            })
+        return jsonify(data)
+
+    elif request.method == 'POST':
+        data = request.get_json()
+        new_offers = Offer(
+            order_id=data['order_id'],
+            executor_id=data['executor_id'],
+        )
+        db.session.add(new_offers)
+        db.session.commit()
 
 
-def main():
-    insert_data_01()
+@app.route('/offers/<int:id>/', methods=['GET', 'PUT', 'DELETE'])
+def get_offers_by_id(id):
+    if request.method == 'GET':
+        offer = Offer.query.get(id)
+        data = {
+            'id': offer.id,
+            'order_id': offer.order_id,
+            'executor_id': offer.executor_id,
+        }
+        return jsonify(data)
 
-    app.run(debug=True)
+    elif request.method == 'PUT':
+        data = request.get_json()
+        offer = Offer.query.get(id)
+        offer.order_id = 64
+        offer.executor_id = data['executor_id']
+
+
+        db.session.add(offer)
+        db.session.commit()
+
+        return '', 203
+
+    elif request.method == 'DELETE':
+        offer = Offer.query.get(id)
+        db.session.add(offer)
+        db.session.commit()
 
 
 if __name__ == "__main__":
