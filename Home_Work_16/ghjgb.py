@@ -103,7 +103,7 @@ def orders_index():
         data = []
         for order in Order.query.all():
             customer = User.query.get(order.customer_id).first_name if User.query.get(order.customer_id) else order.customer_id
-            executor = User.query.get(order.executor_id).first_name if User.query.get (order.executor_id) else order.executor_id
+            executor = User.query.get(order.executor_id).first_name if User.query.get(order.executor_id) else order.executor_id
             data.append({
                 'id': order.id,
                 'name': order.name,

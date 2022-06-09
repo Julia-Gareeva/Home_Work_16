@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from data_01 import users, orders, offers
 from datetime import datetime
+
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -48,7 +49,7 @@ def main():
     app.run(debug=True)
 
 
-#######################################################################################################################
+###__________________________________________________________________________________________________________________________
 def insert_data_01():
     user_list = []
     for user in users:
