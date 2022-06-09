@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/app/__init__.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/migrate.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/models.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/routes.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/config.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/data_01.db" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/fixtures/__init__.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/fixtures/offers.json" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/fixtures/orders.json" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/fixtures/user_roles.json" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/fixtures/users.json" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/requirements.txt" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/run.py" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/test_1.db" charset="windows-1251" />
     <file url="PROJECT" charset="windows-1251" />
   </component>

@@ -7,9 +7,11 @@ DATE_PATTERN = re.compile(r'\d{2}/\d{2}/\d{4}')
 
 
 def load_fixture(file_path):
-    # Загружает содержимое фикстуры (fixtures).
-    # :param file_path: Путь до файла с фикстурой.
-    # :return: Данные из фикстуры, либо пустой список, если не найдено.
+    """ Р—Р°РіСЂСѓР¶Р°РµС‚ СЃРѕРґРµСЂР¶РёРјРѕРµ С„РёРєСЃС‚СѓСЂС‹ (fixtures).
+
+    :param file_path: РџСѓС‚СЊ РґРѕ С„Р°Р№Р»Р° СЃ С„РёРєСЃС‚СѓСЂРѕР№.
+    :return: Р”Р°РЅРЅС‹Рµ РёР· С„РёРєСЃС‚СѓСЂС‹, Р»РёР±Рѕ РїСѓСЃС‚РѕР№ СЃРїРёСЃРѕРє, РµСЃР»Рё РЅРµ РЅР°Р№РґРµРЅРѕ.
+    """
     content = []
     if os.path.isfile(file_path):
         with open(file_path) as file:
@@ -21,7 +23,7 @@ def migration(fixture_path, model, convert_dates=False):
     fixture_content = load_fixture(fixture_path)
 
     for fixture in fixture_content:
-        # Конвертация дат из mm/dd/YYYY в ISO-8601.
+        # РљРѕРЅРІРµСЂС‚Р°С†РёСЏ РґР°С‚ РёР· mm/dd/YYYY РІ ISO-8601.
         if convert_dates:
             for field_name, field_value in fixture.items():
                 if isinstance(field_value, str) and field_value.count('/') == 2:

@@ -6,11 +6,11 @@ FIXTURE_BASE_DIR = 'fixtures'
 
 
 class Config:
-    # Настройки ORM.
+    # РќР°СЃС‚СЂРѕР№РєРё ORM.
     SQLALCHEMY_DATABASE_URI = f'sqlite:///{DATABASE_FILE_PATH}'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    # Фикстуры.
+    # Р¤РёРєСЃС‚СѓСЂС‹.
     USER_ROLES_FIXTURE_PATH = os.path.join(FIXTURE_BASE_DIR, 'user_roles.join')
     USERS_FIXTURE_PATH = os.path.join(FIXTURE_BASE_DIR, 'users.json')
     ORDERS_FIXTURE_PATH = os.path.join(FIXTURE_BASE_DIR, 'orders.json')
